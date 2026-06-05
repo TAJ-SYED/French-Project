@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Miroir de Paris - Restaurant Parisien</title>
+    <style>
+        :root {
+            --bg-light: #fbfbfd;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(0, 0, 0, 0.06);
+            --accent-gold: #c5a059;
+            --accent-gold-hover: #b38f4a;
+            --text-dark: #1d1d1f;
+            --text-dim: #6e6e73;
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f5f7, #fbfbfd);
+            background-attachment: fixed;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 60px;
+        }
+
+        /* Subtle warm ambient glows for depth */
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(197,160,89,0.04) 0%, rgba(255,255,255,0) 70%);
+            top: -10%;
+            left: -10%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-glow-2 {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(197,160,89,0.03) 0%, rgba(255,255,255,0) 70%);
+            bottom: -10%;
+            right: -10%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Header Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.01);
+        }
+
+        .menu-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: color 0.2s ease;
+        }
+
+        .menu-toggle-btn:hover {
+            color: var(--accent-gold);
+        }
+
+        .menu-toggle-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Currency Toggle Switch */
+        .currency-switch {
+            display: flex;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid var(--glass-border);
+            padding: 3px;
+            border-radius: 20px;
+        }
+
+        .currency-btn {
+            padding: 5px 14px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .currency-btn.active {
+            background: #ffffff;
+            color: var(--text-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        /* Sidebar Drawer System */
+        .side-nav-drawer {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            z-index: 200;
+            padding: 40px 30px;
+            transition: cubic-bezier(0.4, 0, 0.2, 1) 0.35s;
+            box-shadow: 10px 0 40px rgba(0,0,0,0.04);
+        }
+
+        .side-nav-drawer.open {
+            left: 0;
+        }
+
+        .close-drawer-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 1.8rem;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-drawer-btn:hover {
+            color: var(--text-dark);
+        }
+
+        .drawer-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .nav-links-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .nav-link-item {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+
+        .nav-link-item svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .nav-link-item:hover, .nav-link-item.active {
+            color: var(--text-dark);
+            background: rgba(0,0,0,0.03);
+        }
+        
+        .nav-link-item.active {
+            color: var(--accent-gold);
+            background: rgba(197,160,89,0.08);
+            font-weight: 600;
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.15);
+            backdrop-filter: blur(4px);
+            z-index: 150;
+            display: none;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+        }
+
+        /* Layout Framework panels */
+        main {
+            max-width: 1140px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-panel {
+            display: none;
+            animation: panelFadeIn 0.4s ease forwards;
+        }
+
+        .page-panel.active {
+            display: block;
+        }
+
+        @keyframes panelFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Page Presentation Design (Day 1) */
+        .home-hero-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 45px;
+            text-align: center;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: var(--shadow-md);
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .custom-logo-frame {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .home-hero-card h1 {
+            font-size: 2.8rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .home-hero-card h1 span {
+            color: var(--accent-gold);
+            font-weight: 400;
+        }
+
+        .home-tagline {
+            color: var(--accent-gold);
+            font-style: italic;
+            font-size: 1.15rem;
+            margin-bottom: 35px;
+        }
+
+        .home-desc {
+            color: var(--text-dim);
+            line-height: 1.75;
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .home-meta-grid {
+            border-top: 1px solid var(--glass-border);
+            padding-top: 35px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            text-align: left;
+        }
+
+        @media(max-width: 640px) {
+            .home-meta-grid { grid-template-columns: 1fr; }
+        }
+
+        .meta-box {
+            background: rgba(0,0,0,0.01);
+            border: 1px solid rgba(0,0,0,0.02);
+            padding: 16px;
+            border-radius: 12px;
+        }
+
+        .meta-box strong {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-gold);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .meta-box strong svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        .meta-box p {
+            color: var(--text-dark);
+            font-size: 0.92rem;
+            line-height: 1.5;
+        }
+
+        /* Menu Design Modules (Days 2, 3, 4) */
+        .menu-section-header {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin: 45px 0 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-section-header svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--accent-gold);
+        }
+
+        .menu-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .menu-layout-grid { grid-template-columns: 1fr; }
+        }
+
+        .menu-card-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 18px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .menu-card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            border-color: rgba(197,160,89,0.2);
+        }
+
+        .item-picture-frame {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+            background: #f5f5f7;
+        }
+
+        .item-picture-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-text-block {
+            flex-grow: 1;
+        }
+
+        .item-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+            gap: 10px;
+        }
+
+        .item-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .item-price-tag {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .item-description {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.45;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
+
+    <div class="drawer-overlay" id="overlay" onclick="closeNav()"></div>
+
+    <!-- SIDEBAR INTERFACE WITH SYSTEM ICONS -->
+    <nav class="side-nav-drawer" id="sideDrawer">
+        <button class="close-drawer-btn" onclick="closeNav()">&times;</button>
+        <div class="drawer-brand">Le Miroir</div>
+        <ul class="nav-links-list">
+            <li>
+                <a class="nav-link-item active" id="lnk-1" onclick="navigateToPanel(1)">
+                    <svg viewBox="0 0 24 24"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/></svg>
+                    Day 1: Présentation
+                </a>
+            </li>
+            <li>
+                <a class="nav-link-item" id="lnk-2" onclick="navigateToPanel(2)">
+                    <svg viewBox="0 0 24 24"><path d="M11,9H13V11H11V9M11,5H13V7H11V5M11,13H13V15H11V13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20Z"/></svg>
+                    Day 2: Entrées & Plats
+                </a>
+            </li>
+            <li>
+                <a class="nav-link-item" id="lnk-3" onclick="navigateToPanel(3)">
+                    <svg viewBox="0 0 24 24"><path d="M16.88,2.88L14,5.76V9.24L16.88,6.36L19.76,9.24V5.76L16.88,2.88M12,6H7V13H12V6M5,15V21H19V15H5M17,17A1,1 0 0,1 18,18A1,1 0 0,1 17,19A1,1 0 0,1 16,18A1,1 0 0,1 17,17M13,17A1,1 0 0,1 14,18A1,1 0 0,1 13,19A1,1 0 0,1 12,18A1,1 0 0,1 13,17M9,17A1,1 0 0,1 10,18A1,1 0 0,1 9,19A1,1 0 0,1 8,18A1,1 0 0,1 9,17Z"/></svg>
+                    Day 3: Accompagnements & Desserts
+                </a>
+            </li>
+            <li>
+                <a class="nav-link-item" id="lnk-4" onclick="navigateToPanel(4)">
+                    <svg viewBox="0 0 24 24"><path d="M2,21H22V23H2V21M20,19V17H4V19H20M19.07,13.28C19.5,12.5 19.75,11.57 19.75,10.5C19.75,7.3 17.43,4.65 14.43,4.1C13.93,2.88 12.73,2 11.31,2C9.9,2 8.7,2.88 8.2,4.1C5.2,4.65 2.88,7.3 2.88,10.5C2.88,11.57 3.13,12.5 3.56,13.28C2.62,14.2 2,15.5 2,17H22C22,15.5 21.38,14.2 20.44,13.28M11.31,4C11.82,4 12.27,4.31 12.44,4.78C12.5,4.95 12.5,5.14 12.5,5.33C12.25,5.12 11.83,5 11.31,5C10.8,5 10.38,5.12 10.13,5.33C10.13,5.14 10.13,4.95 10.19,4.78C10.36,4.31 10.81,4 11.31,4M5,10.5C5,8 7,5.97 9.5,5.97C9.75,5.97 10,6 10.25,6.05C9.47,6.65 9,7.63 9,8.72V9H7V10H9V11.5H7V12.5H9V14.03C7,13.84 5,12.44 5,10.5M14.5,5.97C17,5.97 19,8 19,10.5C19,12.44 17,13.84 15,14.03V12.5H17V11.5H15V10H17V9H15V8.72C15,7.63 14.53,6.65 13.75,6.05C14,6 14.25,5.97 14.5,5.97M11,10.5V7H11.63V10.5H11Z"/></svg>
+                    Day 4: Boissons & Spécialités
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header>
+        <button class="menu-toggle-btn" onclick="openNav()">
+            <!-- Minimal Sidebar Toggle Icon -->
+            <svg viewBox="0 0 24 24"><path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/></svg>
+            <span>EXPLORER</span>
+        </button>
+        
+        <div class="currency-switch" onclick="handleCurrencyToggle()">
+            <button id="btn-eur" class="currency-btn active">EUR</button>
+            <button id="btn-usd" class="currency-btn">USD</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- DAY 1 PANEL: RE-CENTERED HOME PROFILE WITH CUSTOM LOGO LINK -->
+        <div id="panel-1" class="page-panel active">
+            <div class="home-hero-card">
+                <div class="custom-logo-frame">
+                    <img src="Restaurant.png" alt="Le Miroir de Paris Logo">
+                </div>
+                <h1>Le Miroir <span>de Paris</span></h1>
+                <div class="home-tagline">Une expérience gastronomique intemporelle au cœur de l'Île-de-France.</div>
+                <p class="home-desc">
+                    Situé dans le prestigieux deuxième arrondissement, notre bistro célèbre l'art culinaire traditionnel français. 
+                    Nous honorons les recettes historiques à travers des cuissons lentes, des réductions de sauces méticuleuses, 
+                    et des ingrédients rigoureusement sélectionnés auprès de nos producteurs locaux. Notre grande spécialité maison, 
+                    le Cassoulet Toulousain ainsi que nos pièces de viande braisées, incarnent l'authenticité et le raffinement 
+                    d'un véritable héritage gastronomique sans compromis moderne.
+                </p>
+                <div class="home-meta-grid">
+                    <div class="meta-box">
+                        <strong>
+                            <svg viewBox="0 0 24 24"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/></svg>
+                            Coordonnées
+                        </strong>
+                        <p>14 Rue de la Paix<br>75002 Paris, France</p>
+                    </div>
+                    <div class="meta-box">
+                        <strong>
+                            <svg viewBox="0 0 24 24"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"/></svg>
+                            Téléphone & Contact
+                        </strong>
+                        <p>+33 1 42 68 53 00<br>Contact@lemiroir.fr</p>
+                    </div>
+                    <div class="meta-box">
+                        <strong>
+                            <svg viewBox="0 0 24 24"><path d="M12,18.54L19.37,12.8L21,14.07L12,21.07L3,14.07L4.63,12.8L12,18.54M12,16L3,9L12,2L21,9L12,16M12,4.53L5.82,9L12,13.47L18.18,9L12,4.53Z"/></svg>
+                            Quartier Desservi
+                        </strong>
+                        <p>Place Vendôme / 2e Arrondissement</p>
+                    </div>
+                    <div class="meta-box">
+                        <strong>
+                            <svg viewBox="0 0 24 24"><path d="M11,9H13V11H11V9M11,5H13V7H11V5M11,13H13V15H11V13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20Z"/></svg>
+                            Spécialité Principale
+                        </strong>
+                        <p>Les viandes braisées & Réductions de sauce</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 2 PANEL: STARTERS & MAINS -->
+        <div id="panel-2" class="page-panel">
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M11,9H13V11H11V9M11,5H13V7H11V5M11,13H13V15H11V13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20Z"/></svg>
+                Les Entrées
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Soup.png" alt="Soupe à l'Oignon">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Soupe à l'Oignon Gratinée</span>
+                            <span class="item-price-tag" data-eur="9.50" data-usd="11.02">9.50 €</span>
+                        </div>
+                        <p class="item-description">Rich beef broth infused with caramelized onions, topped with a toasted baguette crouton and melted Comté cheese.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Escargots.png" alt="Escargots">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Escargots de Bourgogne</span>
+                            <span class="item-price-tag" data-eur="14.00" data-usd="16.24">14.00 €</span>
+                        </div>
+                        <p class="item-description">Six wild Burgundy snails baked in their shells with a highly concentrated garlic, parsley, and butter emulsion.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Mustard.jpg" alt="Œufs Mayonnaise">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Œufs Mayonnaise</span>
+                            <span class="item-price-tag" data-eur="6.50" data-usd="7.54">6.50 €</span>
+                        </div>
+                        <p class="item-description">Traditional retro-bistro dish featuring soft-boiled eggs coated in a house-made Dijon-infused mayonnaise.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Pate.png" alt="Pâté">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Pâté de Campagne</span>
+                            <span class="item-price-tag" data-eur="11.00" data-usd="12.76">11.00 €</span>
+                        </div>
+                        <p class="item-description">Coarsely ground pork and duck terrine seasoned with allspice, served cold with cornichons and a crusty sourdough.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Salad.png" alt="Salade Chèvre">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Salade de Chèvre Chaud</span>
+                            <span class="item-price-tag" data-eur="10.50" data-usd="12.18">10.50 €</span>
+                        </div>
+                        <p class="item-description">Warm, local goat cheese rounds broiled on baguette slices, served over a bed of mixed field greens with a walnut vinaigrette.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M11,9H13V11H11V9M11,5H13V7H11V5M11,13H13V15H11V13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20Z"/></svg>
+                Les Plats Principaux
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Bour.png" alt="Boeuf Bourguignon">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Boeuf Bourguignon</span>
+                            <span class="item-price-tag" data-eur="24.50" data-usd="28.42">24.50 €</span>
+                        </div>
+                        <p class="item-description">Chunks of beef chuck slow-braised for hours in a full-bodied red Burgundy wine, accompanied by pearl onions and lardons.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Coq.png" alt="Coq au Vin">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Coq au Vin</span>
+                            <span class="item-price-tag" data-eur="22.00" data-usd="25.52">22.00 €</span>
+                        </div>
+                        <p class="item-description">Traditional heritage chicken braised slowly in red wine broth, aromatic root vegetables, and smoked bacon strips.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Chicken.png" alt="Confit de Canard">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Confit de Canard</span>
+                            <span class="item-price-tag" data-eur="26.00" data-usd="30.16">26.00 €</span>
+                        </div>
+                        <p class="item-description">Crisp, slow-cooked duck leg cured in salt and slow-cooked in its own rendered fat until perfectly tender.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="stk.jpg" alt="Steak Frites">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Steak Frites</span>
+                            <span class="item-price-tag" data-eur="28.50" data-usd="33.06">28.50 €</span>
+                        </div>
+                        <p class="item-description">Pan-seared ribeye steak cooked to preference, finished with compound butter and accompanied by hand-cut matchstick potatoes.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Moules.png" alt="Moules">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Moules Marinières</span>
+                            <span class="item-price-tag" data-eur="19.50" data-usd="22.62">19.50 €</span>
+                        </div>
+                        <p class="item-description">Prince Edward Island mussels steamed rapidly in a white wine, shallot, garlic, and heavy cream reduction.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 3 PANEL: SIDES & DESSERTS -->
+        <div id="panel-3" class="page-panel">
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M16.88,2.88L14,5.76V9.24L16.88,6.36L19.76,9.24V5.76L16.88,2.88M12,6H7V13H12V6M5,15V21H19V15H5M17,17A1,1 0 0,1 18,18A1,1 0 0,1 17,19A1,1 0 0,1 16,18A1,1 0 0,1 17,17M13,17A1,1 0 0,1 14,18A1,1 0 0,1 13,19A1,1 0 0,1 12,18A1,1 0 0,1 13,17M9,17A1,1 0 0,1 10,18A1,1 0 0,1 9,19A1,1 0 0,1 8,18A1,1 0 0,1 9,17Z"/></svg>
+                Les Plats d'Accompagnement
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Gratin.webp" alt="Gratin Dauphinois">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Gratin Dauphinois</span>
+                            <span class="item-price-tag" data-eur="7.00" data-usd="8.12">7.00 €</span>
+                        </div>
+                        <p class="item-description">Sliced Russet potatoes layered precisely and baked in an un-curdled mixture of heavy cream, garlic, and a hint of nutmeg.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Rat.jpg" alt="Ratatouille">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Ratatouille</span>
+                            <span class="item-price-tag" data-eur="6.50" data-usd="7.54">6.50 €</span>
+                        </div>
+                        <p class="item-description">A slow-simmered Provençal vegetable medley consisting of eggplant, green zucchini, bell peppers, and tomatoes.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Hari.webp" alt="Haricots Verts">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Haricots Verts au Beurre</span>
+                            <span class="item-price-tag" data-eur="5.50" data-usd="6.38">5.50 €</span>
+                        </div>
+                        <p class="item-description">Slender French green beans blanched and tossed quickly in clarified butter and minced shallots.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="puree.jpeg" alt="Purée">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Purée de Pommes de Terre</span>
+                            <span class="item-price-tag" data-eur="6.00" data-usd="6.96">6.00 €</span>
+                        </div>
+                        <p class="item-description">Smooth, whipped potatoes incorporated with a high-percentage ratio of unsalted French butter.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="pmme.jpeg" alt="Pommes Sarladaises">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Pommes Sarladaises</span>
+                            <span class="item-price-tag" data-eur="8.00" data-usd="9.28">8.00 €</span>
+                        </div>
+                        <p class="item-description">Sliced potatoes fried directly in rendered duck fat and tossed with chopped garlic and fresh parsley.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M16.88,2.88L14,5.76V9.24L16.88,6.36L19.76,9.24V5.76L16.88,2.88M12,6H7V13H12V6M5,15V21H19V15H5M17,17A1,1 0 0,1 18,18A1,1 0 0,1 17,19A1,1 0 0,1 16,18A1,1 0 0,1 17,17M13,17A1,1 0 0,1 14,18A1,1 0 0,1 13,19A1,1 0 0,1 12,18A1,1 0 0,1 13,17M9,17A1,1 0 0,1 10,18A1,1 0 0,1 9,19A1,1 0 0,1 8,18A1,1 0 0,1 9,17Z"/></svg>
+                Les Desserts
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="creme.jpg" alt="Crème Brûlée">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Crème Brûlée</span>
+                            <span class="item-price-tag" data-eur="8.50" data-usd="9.86">8.50 €</span>
+                        </div>
+                        <p class="item-description">Rich vanilla bean custard base finished with a brittle, uniformly torched layer of caramelized sugar.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Tatin.jpg" alt="Tarte Tatin">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Tarte Tatin</span>
+                            <span class="item-price-tag" data-eur="9.00" data-usd="10.44">9.00 €</span>
+                        </div>
+                        <p class="item-description">Upside-down caramelized apple tart where the fruit is caramelized in butter and sugar prior to baking.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Mousse.jpg" alt="Mousse">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Mousse au Chocolat</span>
+                            <span class="item-price-tag" data-eur="7.50" data-usd="8.70">7.50 €</span>
+                        </div>
+                        <p class="item-description">Aerated, light dark chocolate mousse prepared utilizing whipped egg whites and heavy European cream.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Prof.jpg" alt="Profiteroles">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Profiteroles</span>
+                            <span class="item-price-tag" data-eur="10.00" data-usd="11.60">10.00 €</span>
+                        </div>
+                        <p class="item-description">Choux pastry balls split horizontally, filled with premium vanilla bean ice cream, and drizzled with chocolate ganache.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Macs.jpeg" alt="Macarons">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Assiette de Macarons</span>
+                            <span class="item-price-tag" data-eur="11.00" data-usd="12.76">11.00 €</span>
+                        </div>
+                        <p class="item-description">A curated selection of five delicate almond-meringue cookie shells with assorted ganache fillings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 4 PANEL: DRINKS & SPECIALTIES -->
+        <div id="panel-4" class="page-panel">
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M2,21H22V23H2V21M20,19V17H4V19H20M19.07,13.28C19.5,12.5 19.75,11.57 19.75,10.5C19.75,7.3 17.43,4.65 14.43,4.1C13.93,2.88 12.73,2 11.31,2C9.9,2 8.7,2.88 8.2,4.1C5.2,4.65 2.88,7.3 2.88,10.5C2.88,11.57 3.13,12.5 3.56,13.28C2.62,14.2 2,15.5 2,17H22C22,15.5 21.38,14.2 20.44,13.28M11.31,4C11.82,4 12.27,4.31 12.44,4.78C12.5,4.95 12.5,5.14 12.5,5.33C12.25,5.12 11.83,5 11.31,5C10.8,5 10.38,5.12 10.13,5.33C10.13,5.14 10.13,4.95 10.19,4.78C10.36,4.31 10.81,4 11.31,4M5,10.5C5,8 7,5.97 9.5,5.97C9.75,5.97 10,6 10.25,6.05C9.47,6.65 9,7.63 9,8.72V9H7V10H9V11.5H7V12.5H9V14.03C7,13.84 5,12.44 5,10.5M14.5,5.97C17,5.97 19,8 19,10.5C19,12.44 17,13.84 15,14.03V12.5H17V11.5H15V10H17V9H15V8.72C15,7.63 14.53,6.65 13.75,6.05C14,6 14.25,5.97 14.5,5.97M11,10.5V7H11.63V10.5H11Z"/></svg>
+                Les Boissons
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Cafe.webp" alt="Café au Lait">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Café au Lait</span>
+                            <span class="item-price-tag" data-eur="4.20" data-usd="4.87">4.20 €</span>
+                        </div>
+                        <p class="item-description">Strong espresso combined with a balanced portion of steamed milk, traditionally consumed post-meal.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Orang.jpeg" alt="Orangina">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Orangina</span>
+                            <span class="item-price-tag" data-eur="3.80" data-usd="4.41">3.80 €</span>
+                        </div>
+                        <p class="item-description">Lightly carbonated, classic French citrus beverage containing real orange pulp and mandarin oil.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Sir.jpeg" alt="Sirop">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Sirop de Menthe</span>
+                            <span class="item-price-tag" data-eur="3.00" data-usd="3.48">3.00 €</span>
+                        </div>
+                        <p class="item-description">Highly concentrated green mint syrup diluted perfectly with chilled, still mineral water.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Citron.jpeg" alt="Citron Pressé">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Citron Pressé</span>
+                            <span class="item-price-tag" data-eur="4.50" data-usd="5.22">4.50 €</span>
+                        </div>
+                        <p class="item-description">Deconstructed fresh lemon juice served alongside pure cane sugar syrup and iced water for manual assembly.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="Badi.jpg" alt="Badoit">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Eau Minérale Gazeuse (Badoit)</span>
+                            <span class="item-price-tag" data-eur="5.00" data-usd="5.80">5.00 €</span>
+                        </div>
+                        <p class="item-description">Naturally sparkling French mineral water sourced directly from Saint-Galmier.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="menu-section-header">
+                <svg viewBox="0 0 24 24"><path d="M2,21H22V23H2V21M20,19V17H4V19H20M19.07,13.28C19.5,12.5 19.75,11.57 19.75,10.5C19.75,7.3 17.43,4.65 14.43,4.1C13.93,2.88 12.73,2 11.31,2C9.9,2 8.7,2.88 8.2,4.1C5.2,4.65 2.88,7.3 2.88,10.5C2.88,11.57 3.13,12.5 3.56,13.28C2.62,14.2 2,15.5 2,17H22C22,15.5 21.38,14.2 20.44,13.28M11.31,4C11.82,4 12.27,4.31 12.44,4.78C12.5,4.95 12.5,5.14 12.5,5.33C12.25,5.12 11.83,5 11.31,5C10.8,5 10.38,5.12 10.13,5.33C10.13,5.14 10.13,4.95 10.19,4.78C10.36,4.31 10.81,4 11.31,4M5,10.5C5,8 7,5.97 9.5,5.97C9.75,5.97 10,6 10.25,6.05C9.47,6.65 9,7.63 9,8.72V9H7V10H9V11.5H7V12.5H9V14.03C7,13.84 5,12.44 5,10.5M14.5,5.97C17,5.97 19,8 19,10.5C19,12.44 17,13.84 15,14.03V12.5H17V11.5H15V10H17V9H15V8.72C15,7.63 14.53,6.65 13.75,6.05C14,6 14.25,5.97 14.5,5.97M11,10.5V7H11.63V10.5H11Z"/></svg>
+                Les Spécialités Maison
+            </h2>
+            <div class="menu-layout-grid">
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="cas.jpg" alt="Cassoulet">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Cassoulet Toulousain</span>
+                            <span class="item-price-tag" data-eur="32.00" data-usd="37.12">32.00 €</span>
+                        </div>
+                        <p class="item-description">Rich, slow-baked casserole combining white beans, duck confit, pork belly, and regional Toulouse sausages.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="bull.webp" alt="Bouillabaisse">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Bouillabaisse</span>
+                            <span class="item-price-tag" data-eur="35.00" data-usd="40.60">35.00 €</span>
+                        </div>
+                        <p class="item-description">Provençal fish stew featuring assorted coastal catches simmered in a saffron, fennel, and tomato broth.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="tar.jpg" alt="Tartare">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Steak Tartare Coupé au Couteau</span>
+                            <span class="item-price-tag" data-eur="25.00" data-usd="29.00">25.00 €</span>
+                        </div>
+                        <p class="item-description">Ultra-premium raw beef flank finely hand-diced, mixed to order with capers, shallots, and mustard.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="blanq.jpeg" alt="Blanquette">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Blanquette de Veau</span>
+                            <span class="item-price-tag" data-eur="27.00" data-usd="31.32">27.00 €</span>
+                        </div>
+                        <p class="item-description">Savory velouté ragout of tender veal pieces cooked in a white stock base enriched with cream and mushrooms.</p>
+                    </div>
+                </div>
+                <div class="menu-card-item">
+                    <div class="item-picture-frame">
+                        <img src="solo.webp" alt="Sole Meunière">
+                    </div>
+                    <div class="item-text-block">
+                        <div class="item-header-row">
+                            <span class="item-name">Sole Meunière</span>
+                            <span class="item-price-tag" data-eur="38.00" data-usd="44.08">38.00 €</span>
+                        </div>
+                        <p class="item-description">Whole flatfish dredged lightly in flour, pan-fried in brown butter, finished with fresh lemon and parsley.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Projet de Français 1 — Éleve: Tajammul Ismail Syed — Période 3 — Base Économique Matrix: 1€ = $1.16 USD (Juin 2026)
+    </footer>
+
+    <script>
+        let currentCurrency = 'EUR';
+
+        function openNav() {
+            document.getElementById("sideDrawer").classList.add("open");
+            document.getElementById("overlay").classList.add("active");
+        }
+
+        function closeNav() {
+            document.getElementById("sideDrawer").classList.remove("open");
+            document.getElementById("overlay").classList.remove("active");
+        }
+
+        function navigateToPanel(dayNumber) {
+            document.querySelectorAll('.nav-link-item').forEach((link, idx) => {
+                if (idx === (dayNumber - 1)) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.page-panel').forEach((panel) => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(`panel-${dayNumber}`).classList.add('active');
+            
+            closeNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleCurrencyToggle() {
+            currentCurrency = currentCurrency === 'EUR' ? 'USD' : 'EUR';
+            
+            if (currentCurrency === 'EUR') {
+                document.getElementById('btn-eur').classList.add('active');
+                document.getElementById('btn-usd').classList.remove('active');
+            } else {
+                document.getElementById('btn-usd').classList.add('active');
+                document.getElementById('btn-eur').classList.remove('active');
+            }
+
+            document.querySelectorAll('.item-price-tag').forEach((priceTag) => {
+                const eurVal = priceTag.getAttribute('data-eur');
+                const usdVal = priceTag.getAttribute('data-usd');
+                
+                if (currentCurrency === 'EUR') {
+                    priceTag.textContent = `${eurVal} €`;
+                } else {
+                    priceTag.textContent = `$${usdVal}`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
